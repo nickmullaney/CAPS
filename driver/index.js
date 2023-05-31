@@ -12,9 +12,8 @@ const handler = require('./handler.js')
 
 const pickupHandler = (payload) => {
   setTimeout(() => {
-    handler(payload)
-    // console.log('EVENT: Driver is on their way to pickup: ', payload);
-    // eventEmitter.emit('DELIVERY', payload);
+    console.log('EVENT: Driver is on their way to pickup: ', payload);
+    eventEmitter.emit('DELIVERY', payload);
   }, 1000);
 };
 
