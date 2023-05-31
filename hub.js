@@ -1,6 +1,6 @@
 'use strict';
 
-let eventEmitter = require('./eventEmitter');
+let eventEmitter = require('./eventPool');
 
 // kicks off first package
 require('./vendor/index.js');

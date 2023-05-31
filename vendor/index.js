@@ -1,6 +1,6 @@
 'use strict';
 
-let eventEmitter = require('../eventEmitter.js');
+let eventEmitter = require('../eventPool.js');
 
 var Chance = require('chance');
 // Instantiate Chance so it can be used
@@ -16,7 +16,6 @@ setInterval(() => {
     address: chance.address(),
   };
   eventEmitter.emit('NEW_ORDER', { payload });
-  console.log('Howdy');
   // console.log('NEW_ORDER', { payload });
 }, 9000);
 

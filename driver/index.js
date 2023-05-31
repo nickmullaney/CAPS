@@ -1,10 +1,20 @@
 'use strict';
-const eventEmitter = require('../eventEmitter');
+const eventEmitter = require('../eventPool');
+const handler = require('./handler.js')
+
+// const newOrderHandler = (payload) =>{
+//   setTimeout(() => {
+//     handler(payload)
+//     // console.log('EVENT: Driver is on their way to pickup: ', payload);
+//     // eventEmitter.emit('DELIVERY', payload);
+//   }, 1000);
+// };
 
 const pickupHandler = (payload) => {
   setTimeout(() => {
-    console.log('EVENT: Driver is on their way to pickup: ', payload);
-    eventEmitter.emit('DELIVERY', payload);
+    handler(payload)
+    // console.log('EVENT: Driver is on their way to pickup: ', payload);
+    // eventEmitter.emit('DELIVERY', payload);
   }, 1000);
 };
 
@@ -28,5 +38,6 @@ const thankYouHandler = (payload) => {
     
   }, 1000);
 }
+
 
 module.exports = { pickupHandler, deliveryHandler, deliveredHandler, thankYouHandler };
