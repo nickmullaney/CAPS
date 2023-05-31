@@ -1,35 +1,26 @@
-// 'use strict';
+'use strict';
 
-// let eventEmitter = require('../eventPool');
+let eventEmitter = require('../eventPool');
 
+const pickupOccurred = (payload) => {
+  console.log('DRIVER: picked up', payload.orderId);
+  eventEmitter.emit('in-transit', payload);
+};
 
-// const pickupHandler = (payload) => {
-//   setTimeout(() => {
-//     handler(payload)
-//     // console.log('EVENT: Driver is on their way to pickup: ', payload);
-//     // eventEmitter.emit('DELIVERY', payload);
-//   }, 1000);
-// };
+const packageDelivered = (payload) => {
+  console.log('DRIVER: delivered', payload.orderId);
+  eventEmitter.emit('delivered', payload);
+  // eventEmitter.emit('in-transit', payload);
+};
 
-// const deliveryHandler = (payload) => {
-//   setTimeout(() => {
-//     console.log('EVENT: In-Transit: ', payload);
-//     eventEmitter.emit('HAPPENING', payload);
-//   }, 1000);
-// }
+const handlePickupAndDelivery = (payload) => {
+  setTimeout(() => {
+    pickupOccurred(payload);
+  }, 1000);
+  setTimeout(() => {
+    packageDelivered(payload);
+  }, 2000);
+};
+// eventEmitter.on('in-transit', packageDelivered);
 
-// const deliveredHandler = (payload) => {
-//   setTimeout(() => {
-//     console.log('EVENT: Package has been delivered', payload);
-//     eventEmitter.emit('DELIVERED', payload);
-//   }, 1000);
-// }
-
-// const thankYouHandler = (payload) => {
-//   setTimeout(() => {
-//     console.log('EVENT: Thank you, your order has been handed off', payload);
-    
-//   }, 1000);
-// }
-
-// module.exports = { pickupHandler, deliveryHandler, deliveredHandler, thankYouHandler };
+module.exports = { pickupOccurred, packageDelivered, handlePickupAndDelivery };

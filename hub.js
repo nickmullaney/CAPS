@@ -1,18 +1,19 @@
-'use strict';
 
-let eventEmitter = require('./eventPool');
+// const { newOrderHandler } = require('./vendor/index');
 
-// kicks off first package
-require('./vendor/index.js');
+const eventPool = require('./eventPool');
+// const payload = require('./examples/chance');
+require('./vendor/index');
+require('./driver/index');
 
-// Handlers
-const { pickupHandler } = require('./driver');
-const { deliveryHandler } = require('./driver');
-const { deliveredHandler } = require('./driver');
-const { thankYouHandler } = require('./driver');
+//invokes new order from vendor file to begin order process
+// newOrderHandler(payload); 
 
-// Listeners
-eventEmitter.on('NEW_ORDER', pickupHandler);
-eventEmitter.on('DELIVERY', deliveryHandler);
-eventEmitter.on('HAPPENING', deliveredHandler);
-eventEmitter.on('DELIVERED', thankYouHandler);
+eventPool.on('event', (payload) =>{logger('pickup', payload)});
+eventPool.on('in-transit', (payload) =>{logger('in-transit', payload)});
+eventPool.on('delivered', (payload) =>{logger('delivered', payload)});
+
+function logger(event, payload){
+  const timestamp = new Date();
+  console.log('EVENT:', {event, timestamp, payload});
+}
