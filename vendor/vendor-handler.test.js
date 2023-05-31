@@ -12,6 +12,7 @@ jest.mock('../eventPool.js', () => {
 });
 
 let consoleSpy;
+
 beforeAll(() => {
   consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 });
@@ -29,11 +30,11 @@ describe('Vendor handlers', () => {
 
     orderHandler(payload);
 
-    expect(eventEmitter.emit).toHaveBeenCalledWith('pickup', payload);
     expect(consoleSpy).toHaveBeenCalledWith('VENDOR: ORDER ready for pickup:', payload);
+    expect(eventEmitter.emit).toHaveBeenCalledWith('pickup', payload);
   });
 
-  test('Should log correct emit and console log for deliveredMessage', () => {
+  test('Should log correct emit and console log for thankDriver', () => {
     let payload = {
       customer: 'Test Test',
     };
