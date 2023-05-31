@@ -11,8 +11,9 @@ To deploy your application at GitHub pages, you'll need to add a home page prope
   "homepage": "https://yourname.github.io/repository-name"
 }
 ```
+# To Run
 
-## Node / Express Applications
+To run the application please use ```node hub.js```
 
 ### For Tests
 
