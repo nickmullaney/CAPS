@@ -1,19 +1,19 @@
 
-// const { newOrderHandler } = require('./vendor/index');
+'use strict';
 
 const eventPool = require('./eventPool');
-// const payload = require('./examples/chance');
+
+// Handlers, Making system aware of vendor and driver
 require('./vendor/index');
 require('./driver/index');
 
-//invokes new order from vendor file to begin order process
-// newOrderHandler(payload); 
+// Listeners: Listen to all events and log expected content
+eventPool.on('event', (payload) => logger('pickup', payload));
+eventPool.on('in-transit', (payload) => logger('in-transit', payload));
+eventPool.on('delivered', (payload) => logger('delivered', payload));
 
-eventPool.on('event', (payload) =>{logger('pickup', payload)});
-eventPool.on('in-transit', (payload) =>{logger('in-transit', payload)});
-eventPool.on('delivered', (payload) =>{logger('delivered', payload)});
-
-function logger(event, payload){
+// Logs the event, a timestamp and the payload
+function logger(event, payload) {
   const timestamp = new Date();
-  console.log('EVENT:', {event, timestamp, payload});
+  console.log('EVENT:', { event, timestamp, payload });
 }

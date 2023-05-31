@@ -9,7 +9,7 @@ var chance = new Chance();
 
 const orderHandler = (payload = null) => {
   if (!payload) {
-    const payload = {
+    payload = {
       store: chance.company(),
       orderId: chance.guid(),
       customer: chance.name(),
