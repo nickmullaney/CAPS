@@ -1,12 +1,17 @@
 'use strict';
 const { io } = require('socket.io-client');
-const socket = io('http://localhost:3001');
+const socket = io('http://localhost:3001/caps'); // Connect to the caps namespace
 const Chance = require('chance');
 let chance = new Chance();
 
+socket.on('connect', () => {
+  console.log('Connected to CAPS server');
+  socket.emit('joinRoom', 'VendorID'); // Join the room with the vendor ID
+});
 
-const orderHandler = (payload=null) => {
-  if(!payload){
+
+const orderHandler = (payload = null) => {
+  if (!payload) {
     payload = {
       store: chance.company(),
       orderId: chance.guid(),
@@ -14,17 +19,26 @@ const orderHandler = (payload=null) => {
       address: chance.address(),
     };
   }
-  console.log('VENDOR: ORDER ready for pickup:', payload);
-  socket.emit('pickup', payload); 
-};
+  const timestamp = new Date();
+  console.log(`VENDOR: ORDER ready for pickup (${timestamp}):`, payload); 
 
-const thankDriver = (payload) => console.log('VENDOR: Thank you for your order', payload.customer);
+  socket.emit('pickup', { timestamp, payload });
+};
 
 
 const deliveredMessage = (payload) => {
   setTimeout(() => {
-    thankDriver(payload);
-  }, 1000);
+    console.log(`${payload.store}: VENDOR: Thank you for delivering this safely at ${payload.timestamp}`);
+  }, 500);
 };
+// const thankDriver = (payload) => {
+//   console.log(`VENDOR: Your order has been delivered (${payload.timestamp}):`, payload.customer);
+// }
 
-module.exports = { orderHandler, deliveredMessage, thankDriver };
+socket.on('disconnect', () => {
+  console.log('Disconnected from the CAPS server');
+});
+
+socket.on('delivered', deliveredMessage);
+
+module.exports = { orderHandler, deliveredMessage };

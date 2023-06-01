@@ -1,13 +1,15 @@
-'use strict';
-
-let eventEmitter = require('../eventPool');
+const { io } = require('socket.io-client');
+const Chance = require('chance');
+const socket = io('http://localhost:3001/caps');
 
 const { orderHandler, thankDriver } = require('./handler');
 
-jest.mock('../eventPool.js', () => {
+jest.mock('socket.io-client', () => {
   return {
-    on: jest.fn(),
-    emit: jest.fn(),
+    io: jest.fn().mockReturnValue({
+      on: jest.fn(),
+      emit: jest.fn(),
+    }),
   };
 });
 
@@ -22,26 +24,26 @@ afterAll(() => {
 });
 
 describe('Vendor handlers', () => {
-
   test('Should log correct emit and console log for orderHandler', () => {
-    let payload = {
+    const emitSpy = jest.spyOn(socket, 'emit');
+
+    const payload = {
       orderId: 12345,
     };
 
     orderHandler(payload);
 
-    expect(consoleSpy).toHaveBeenCalledWith('VENDOR: ORDER ready for pickup:', payload);
-    expect(eventEmitter.emit).toHaveBeenCalledWith('pickup', payload);
+    expect(consoleSpy).toHaveBeenCalledWith(`VENDOR: ORDER ready for pickup (${payload.timestamp}):`, payload);
+    expect(emitSpy).toHaveBeenCalledWith('pickup', { timestamp: expect.any(Date), payload });
   });
 
   test('Should log correct emit and console log for thankDriver', () => {
-    let payload = {
+    const payload = {
       customer: 'Test Test',
     };
 
     thankDriver(payload);
 
-    expect(consoleSpy).toHaveBeenCalledWith('VENDOR: Thank you for your order', payload.customer);
+    expect(consoleSpy).toHaveBeenCalledWith(`VENDOR: Thank you for your order (${payload.timestamp}):`, payload.customer);
   });
-
 });
