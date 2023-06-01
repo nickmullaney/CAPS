@@ -7,9 +7,6 @@ const PORT = process.env.PORT || 3001;
 // Socket server singleton (sometimes called io)
 const server = new Server();
 
-// Listening for all events on port
-server.listen(PORT);
-
 // Accept connections on a namespace called "caps"
 const capsNamespace = server.of('/caps');
 
@@ -47,6 +44,7 @@ capsNamespace.on('connect', (socket) => {
   socket.on('delivered', (payload) => {
     const timestamp = new Date();
     console.log(`EVENT: delivered (${timestamp}):`, payload);
+    socket.broadcast.emit('delivered', payload);
   });
 
   // Disconnect event
