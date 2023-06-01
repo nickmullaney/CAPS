@@ -3,10 +3,12 @@
 const { io } = require('socket.io-client');
 const socket = io('http://localhost:3001/caps'); // Connect to the caps namespace
 
+socket.emit('getAll', {queueId: 'messages'});
 
 // Function to handle pickup event
 const pickupOccurred = (payload) => {
   console.log('DRIVER: picked up', payload.payload.orderId); // Log pickup message with order ID
+  socket.emit('received', {queueId: 'messages'});
   socket.emit('in-transit', payload); // Emit 'in-transit' event to the server with payload data
 };
 

@@ -6,6 +6,7 @@ const socket = io('http://localhost:3001/caps'); // Connect to the caps namespac
 const Chance = require('chance');
 let chance = new Chance();
 
+
 // Event handler when the socket connects to the CAPS server
 socket.on('connect', () => {
   console.log('Connected to CAPS server');
