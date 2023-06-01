@@ -1,26 +1,43 @@
-# CAPS
-# LAB - Class 11
+# CAPS System
 
-## Project: CAPS
+## Phase 2 Requirements
 
-### Author: Student/Group Name
-Nick M
-### Problem Domain  
+In Phase 2, we’ll be changing the underlying networking implementation of our CAPS system from using node events to using a library called Socket.io so that clients can communicate over a network. Socket.io manages the connection pool for us, making broadcasting much easier to operate, and works well both on the terminal (between servers) and with web clients.
 
-Phase 1 Requirements
-Today, we begin the first of a 4-Phase build of the CAPS system, written in Node.js. In this first phase, our goal is to setup a pool of events and handler functions, with the intent being to refactor parts of the system throughout the week, but keep the handlers themselves largely the same. The task of “delivering a package” doesn’t change (the handler), even if the mechanism for triggering that task (the event) does.
+The core functionality we’ve already built remains the same. The difference in this phase is that we’ll be creating a networking layer. As such, the user stories that speak to application functionality remain unchanged, but our developer story changes to reflect the work needed for refactoring.
 
-The following user/developer stories detail the major functionality for this phase of the project.
+**User Stories:**
+- As a vendor, I want to alert the system when I have a package to be picked up.
+- As a driver, I want to be notified when there is a package to be delivered.
+- As a driver, I want to alert the system when I have picked up a package and it is in transit.
+- As a driver, I want to alert the system when a package has been delivered.
+- As a vendor, I want to be notified when my package has been delivered.
 
-As a vendor, I want to alert the system when I have a package to be picked up.
-As a driver, I want to be notified when there is a package to be delivered.
-As a driver, I want to alert the system when I have picked up a package and it is in transit.
-As a driver, I want to alert the system when a package has been delivered.
-As a vendor, I want to be notified when my package has been delivered.
-And as developers, here are some of the development stories that are relevant to the above.
+**Developer Story:**
+- As a developer, I want to create a network event-driven system using Socket.io so that I can write code that responds to events originating from both servers and client applications.
 
-As a developer, I want to use industry standards for managing the state of each package.
-As a developer, I want to create an event driven system so that I can write code that happens in response to events, in real time.
+**Technical Requirements / Notes:**
+- In order to switch from Node Events to Socket.io, the refactoring process will involve changes to each application to use the core features of Socket.io.
+
+## Overview
+
+The goal of this lab is to create a namespaced Socket.io event server and configure Vendor and Driver Client Modules.
+
+- The Socket Server will create a namespace of `caps` that will receive all CAPS event traffic.
+- Each Vendor and Driver Client will connect to the `caps` namespace.
+- The server will emit specific events to each socket that is listening for their designated events from the Global Event Pool defined in the Server.
+- Each Vendor will only emit and listen for specific events based on their Vendor ID. This will be managed by rooms within Socket.io.
+- Each Driver will “pick up” a package when the vendor notifies the Server that an “order” is ready and simulate “in-transit” and “delivered” events.
+- The expected output of the 3 running applications is the same as it was in Phase 2.
+
+## Output
+
+Note: This is the heart of refactoring. The end result appears to be the same even after you’ve made a holistic change on the underlying code to be cleaner and faster. As developers, we want to do great work without changing the users’ experience.
+
+## Proposed File Structure
+
+Note: The structure below shows both socket clients and the socket server in the same repo. This is for learning and grading convenience, not a requirement. Realistically, the socket server and each of the socket clients could be independent applications and repos.
+
 ### Links and Resources
 
 - [GitHub Actions ci/cd(TBD)](https://github.com/nickmullaney/CAPS/actions) 
@@ -81,4 +98,4 @@ to run tests after running `npm i`, run the command `npm test`
 
 #### UML
 
-![image](lab11.png)
+![Alt text](lab%2012%20CAPS.png)
