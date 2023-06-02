@@ -3,12 +3,11 @@
 require('dotenv').config();
 const { Server } = require('socket.io');
 const PORT = process.env.PORT || 3001;
+const Queue = require('./lib/queue');
+let messageQueue = new Queue();
 
 // Socket server singleton (sometimes called io)
 const server = new Server();
-
-// Listening for all events on port
-server.listen(PORT);
 
 // Accept connections on a namespace called "caps"
 const capsNamespace = server.of('/caps');
@@ -21,7 +20,7 @@ capsNamespace.on('connect', (socket) => {
   socket.on('joinRoom', (room) => {
     console.log('These are the rooms', socket.adapter.rooms);
     console.log('---payload is the room name in this example---', room);
-    
+
     socket.join(room);
 
     console.log(`You've joined the ${room} room`);
@@ -32,9 +31,31 @@ capsNamespace.on('connect', (socket) => {
   socket.on('pickup', (payload) => {
     const timestamp = new Date();
     console.log(`EVENT: pickup (${timestamp}):`, payload);
+    let currentQueue = messageQueue.read(payload.order.store); //payload.order.store
+    // first time we run our server this queue wont exist, we need validation
+    if (!currentQueue) {
+      let queueKey = messageQueue.store(payload.order.store, new Queue());
+      currentQueue = messageQueue.read(queueKey);
+    }
+    // Now that we KNOW we have a current queue, lets store the incoming message
+    // Because that unique messageId is a string, Javascript will maintain order for us.
+    currentQueue.store(payload.messageId, payload);
 
     // Broadcast pickup event to all sockets except the sender
     socket.broadcast.emit('pickup', payload);
+  });
+
+  // Received Event
+  socket.on('received', (payload) => {
+    console.log('Server: Received event', payload);
+    let currentQueue = messageQueue.read(payload.queueId);
+    if (!currentQueue) {
+      currentQueue = messageQueue.read(payload.queueId);
+      // throw new Error('We have messages but no Queue');
+    }
+    let message = messageQueue.remove(payload.queueId);
+
+    socket.broadcast.emit('received', message);
   });
 
   // In-transit event
@@ -47,6 +68,7 @@ capsNamespace.on('connect', (socket) => {
   socket.on('delivered', (payload) => {
     const timestamp = new Date();
     console.log(`EVENT: delivered (${timestamp}):`, payload);
+    socket.broadcast.emit('delivered', payload);
   });
 
   // Disconnect event
@@ -56,10 +78,22 @@ capsNamespace.on('connect', (socket) => {
       socket.leave(room);
     });
   });
+
+  socket.on('getAll', (payload) => {
+    console.log('Attempting to get messages', payload.queueId);
+    let currentQueue = messageQueue.read(payload.store);
+    if (currentQueue && currentQueue.data) {
+      Object.keys(currentQueue.data).forEach((messageId) => {
+        // Sending saved messages that were missed by recipient
+        // Maybe sending to the correct room also works
+        socket.emit('MESSAGE', currentQueue.read(messageId));
+        currentQueue.remove(messageId);
+      });
+    }
+  });
 });
 
 // Start the server
-
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
