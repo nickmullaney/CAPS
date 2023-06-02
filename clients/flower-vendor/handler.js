@@ -1,7 +1,5 @@
 'use strict';
-
-const { io } = require('socket.io-client');
-const socket = io('http://localhost:3001/caps'); // Connect to the caps namespace
+const socket = require('../socket'); // Connect to the caps namespace
 const Chance = require('chance');
 let chance = new Chance();
 const store = '1-800-flowers';
@@ -19,6 +17,13 @@ const orderHandler = (order = null) => {
     };
   }
   const timestamp = new Date();
+  // let payload = {
+  //  event: 'pickup;,
+  //  messageId: order.orderId,
+  //  
+  // 
+  // }
+
   console.log(`VENDOR: ORDER ready for pickup (${timestamp}):`, order);
 
   // Emit the 'pickup' event with the timestamp and payload

@@ -7,7 +7,7 @@ const store = '1-800-flowers';
 
 // Connect to the CAPS Application Server using the caps namespace
 socket.on('connect', () => {
-  console.log('Connected to CAPS server');
+  console.log('1-800 flowers Connected to CAPS server');
 
   // Subscribe to different queues for each store
   socket.emit('joinRoom', store);
