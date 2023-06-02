@@ -26,34 +26,32 @@ afterAll(() => {
 describe('Vendor handlers', () => {
   test('Should log correct emit and console log for orderHandler', () => {
     const emitSpy = jest.spyOn(socket, 'emit');
-  
+
     const payload = {
       orderId: 12345,
     };
-  
+
     orderHandler(payload);
-  
+
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringMatching(/VENDOR: ORDER ready for pickup \(.+\):/),
-      payload
-    );
+      payload);
     expect(emitSpy).toHaveBeenCalledWith('pickup', { timestamp: expect.any(Date), payload });
   });
-  
+
   test('Should log correct console log for deliveredMessage', (done) => {
     const payload = {
       store: 'Test Store',
       timestamp: new Date(),
     };
-  
+
     deliveredMessage(payload);
-  
+
     setTimeout(() => {
       expect(consoleSpy).toHaveBeenCalledWith(
-        `${payload.store}: VENDOR: Thank you for delivering this safely at ${payload.timestamp}`
-      );
+        `${payload.store}: VENDOR: Thank you for delivering this safely at ${payload.timestamp}`);
       done();
     }, 600);
   });
-  
+
 });

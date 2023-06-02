@@ -8,6 +8,10 @@ const { handlePickupAndDelivery, socket } = require('./handler');
 // It also registers an event listener for the 'pickup' event and associates it with the handlePickupAndDelivery function
 socket.on('connect', () => {
   console.log('Connected to CAPS server');
+  // Subscribe to different queues for each store
+  socket.emit('joinRoom', 'driver');
+
+  // Trigger the 'getAll' event to fetch messages from the server for each store's queue
   socket.on('pickup', handlePickupAndDelivery);
 });
 

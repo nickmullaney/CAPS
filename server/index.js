@@ -31,11 +31,10 @@ capsNamespace.on('connect', (socket) => {
   socket.on('pickup', (payload) => {
     const timestamp = new Date();
     console.log(`EVENT: pickup (${timestamp}):`, payload);
-
-    let currentQueue = messageQueue.read(payload.queueId);
+    let currentQueue = messageQueue.read(payload.order.store); //payload.order.store
     // first time we run our server this queue wont exist, we need validation
     if (!currentQueue) {
-      let queueKey = messageQueue.store(payload.queueId, new Queue());
+      let queueKey = messageQueue.store(payload.order.store, new Queue());
       currentQueue = messageQueue.read(queueKey);
     }
     // Now that we KNOW we have a current queue, lets store the incoming message
@@ -51,9 +50,10 @@ capsNamespace.on('connect', (socket) => {
     console.log('Server: Received event', payload);
     let currentQueue = messageQueue.read(payload.queueId);
     if (!currentQueue) {
-      throw new Error('We have messages but no Queue');
+      currentQueue = messageQueue.read(payload.queueId);
+      // throw new Error('We have messages but no Queue');
     }
-    let message = currentQueue.remove(payload.queueId);
+    let message = messageQueue.remove(payload.queueId);
 
     socket.broadcast.emit('received', message);
   });
@@ -80,22 +80,20 @@ capsNamespace.on('connect', (socket) => {
   });
 
   socket.on('getAll', (payload) => {
-    console.log('Attempting to get messages');
-    let currentQueue = messageQueue.read(payload.queueId);
+    console.log('Attempting to get messages', payload.queueId);
+    let currentQueue = messageQueue.read(payload.store);
     if (currentQueue && currentQueue.data) {
-      Object.keys(currentQueue.data).forEach(messageId => {
+      Object.keys(currentQueue.data).forEach((messageId) => {
         // Sending saved messages that were missed by recipient
         // Maybe sending to the correct room also works
         socket.emit('MESSAGE', currentQueue.read(messageId));
-        // Once we emit then our code should receive the messages and remove them
+        currentQueue.remove(messageId);
       });
     }
   });
 });
 
-
 // Start the server
-
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
